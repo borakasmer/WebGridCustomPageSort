@@ -77,7 +77,7 @@ namespace TeklifFormu.Controllers
 
                 //var propertyInfo = typeof(Customer).GetProperty(sort);
                 //data = dbContext.Customers.ToList();
-                data = dbContext.Customers.SqlQuery("select top 25 * from Customers order by " + sort + " " + sortdir).ToList();
+                data = dbContext.Customers.SqlQuery("select top " + rowPerPage + " * from Customers order by " + sort + " " + sortdir).ToList();
                 /*
                 if (sortdir == "ascending")
                     //data = dbContext.Customers.OrderBy(cus => propertyInfo.GetValue(cus, null)).Take(rowPerPage).ToList();
@@ -109,10 +109,13 @@ namespace TeklifFormu.Controllers
                     grid.Column("Phone"))
                     );
 
+                // Eger bir satirdaki row count toplam satir sayisi ile bolumunda tam sayi ise direk pagecount alinir degil ise 1 arttirilir.
+                var _count = dbContext.Customers.Count() % rowPerPage == 0 ? dbContext.Customers.Count() / rowPerPage : (dbContext.Customers.Count() / rowPerPage) + 1;
+
                 return Json(new
                 {
                     Data = htmlString.ToHtmlString(),
-                    Count = dbContext.Customers.Count() / rowPerPage
+                    Count = _count
                 }, JsonRequestBehavior.AllowGet);
             }
         }
